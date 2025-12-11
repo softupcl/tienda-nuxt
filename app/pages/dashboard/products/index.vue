@@ -11,6 +11,7 @@
         </p>
       </div>
       <UButton
+        to="/dashboard/product/new"
         icon="i-lucide-plus"
         label="Agregar Producto"
         color="primary"
@@ -18,106 +19,107 @@
       />
     </div>
 
-    <UTable :data="data" :columns="columns" class="flex-1" />
+    <UTable :data="products" :columns=columns class="flex-1" />
+    <SharedPagination :total="total" :model-value="currentPage" :per-page="perPage" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue';
 import type { TableColumn } from '@nuxt/ui';
+import { dateFormat } from '../../../../shared/utils/date-format';
+
 const UBadge = resolveComponent('UBadge');
-type Payment = {
-  id: string;
-  date: string;
-  status: 'paid' | 'failed' | 'refunded';
-  email: string;
-  amount: number;
-};
-const data = ref<Payment[]>([
-  {
-    id: '4600',
-    date: '2024-03-11T15:30:00',
-    status: 'paid',
-    email: 'james.anderson@example.com',
-    amount: 594,
-  },
-  {
-    id: '4599',
-    date: '2024-03-11T10:10:00',
-    status: 'failed',
-    email: 'mia.white@example.com',
-    amount: 276,
-  },
-  {
-    id: '4598',
-    date: '2024-03-11T08:50:00',
-    status: 'refunded',
-    email: 'william.brown@example.com',
-    amount: 315,
-  },
-  {
-    id: '4597',
-    date: '2024-03-10T19:45:00',
-    status: 'paid',
-    email: 'emma.davis@example.com',
-    amount: 529,
-  },
-  {
-    id: '4596',
-    date: '2024-03-10T15:55:00',
-    status: 'paid',
-    email: 'ethan.harris@example.com',
-    amount: 639,
-  },
-]);
-const columns: TableColumn<Payment>[] = [
+const NuxtLink = resolveComponent('NuxtLink');
+
+const {products, total, currentPage, perPage} = await usePaginatedProducts()
+
+const columns: TableColumn<Product>[] = [
   {
     accessorKey: 'id',
-    header: '#',
+    header: 'Id',
     cell: ({ row }) => `#${row.getValue('id')}`,
   },
-  {
-    accessorKey: 'date',
-    header: 'Date',
+   {
+    accessorKey: 'images',
+    header: 'Imagen',
     cell: ({ row }) => {
-      return new Date(row.getValue('date')).toLocaleString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
+      const images = row.getValue('images') as string[];
+      const url = Array.isArray(images) && images.length >0 ? images[0] : '';
+      if(!url) return h('span',{
+        class: 'text-gray-500'
+      }, 'Sin imagen')
+
+      return h('img',{
+        src : url,
+        alt : 'Imagen del producto',
+        style: 'width:48px; height:48px; object-fit: cover; border-radius: 0.5rem',
+
+      })
+    }
+
+  },
+  {
+    accessorKey: 'name',
+    header: 'Nombre',
+    cell: ({ row }) => {
+      const productName = row.getValue('name');
+      const productId = row.getValue('id');
+
+      return h(NuxtLink,{
+        to:`/dashboard/product/${productId}`,
+        class:'text-blue-500 hover:text-blue-700 underline cursor-pointer'
+      },
+      ()=> productName
+    );
+    }
+  },
+  {
+    accessorKey: 'description',
+    header: 'Descripción',
+    cell: ({ row }) => {
+      return h('div',{
+        style : 'with-space:normal; word-break:break-word: max-with:300px;',
+        class: 'truncate-text',
+      },
+      String(row.getValue('description')).slice(0,50) + '...'
+    )
+    }
+  },
+  
+  {
+    accessorKey: 'price',
+    header: 'Precio',
+    cell:({row}) => formatCurrency(row.getValue('price')),
+  },
+  {
+    accessorKey: 'tags',
+    header: 'Etiquetas',
+    cell:({row}) => {
+      const tags = row.getValue('tags') as string[];
+      if(!Array.isArray(tags)) return ''
+      return h('div',{
+        class: 'flex flex-wrap gap-1'
+      },
+      tags.map((tag)=>h(UBadge,{
+        size: 's',
+        color:'primary',
+        variant:'subtle',
+        class:'mr-0-5 '
+      },
+      () => tag
+    ))
+    )
     },
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const color = {
-        paid: 'success' as const,
-        failed: 'error' as const,
-        refunded: 'neutral' as const,
-      }[row.getValue('status') as string];
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-        row.getValue('status')
-      );
-    },
+    accessorKey: 'createdAt',
+    header: 'Creadp',
+    cell:({row}) => {
+      const value = row.getValue('createdAt');
+      return value ? dateFormat(new Date(value as string)) : '';
+    }
   },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
-    cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: 'CLP',
-      }).format(amount);
-      return h('div', { class: 'text-right font-medium' }, formatted);
-    },
-  },
+ 
 ];
 </script>

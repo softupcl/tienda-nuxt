@@ -1,4 +1,7 @@
 <script setup lang="ts">
+
+const { user,logout }  = useAuthentication();
+
 const breadcrumbItems = [
   {
     label: 'Dashboard',
@@ -26,12 +29,13 @@ const userMenuItems = [
     {
       label: 'Cerrar sesión',
       icon: 'i-lucide-log-out',
-      click: () => {
-        console.log('Logout clicked');
-      },
+      onSelect: async() => {
+        await logout()
+      }
     },
   ],
 ];
+
 </script>
 
 <template>
@@ -69,7 +73,7 @@ const userMenuItems = [
             color="neutral"
             variant="ghost"
             trailing-icon="i-lucide-chevron-down"
-            label="Account"
+            label="Cuenta"
           />
         </UDropdownMenu>
       </div>

@@ -1,0 +1,30 @@
+import prisma from "~~/lib/prisma";
+import { Product } from '../../../../shared/types/product';
+import {z} from 'zod'
+
+const bodySchema = z.object({
+    slug: z.string().min(2),
+    name: z.string().min(3),
+    description: z.string().min(5),
+    price : z.number().min(0),
+    images:z.array(z.string()).optional(), 
+    tags:z.array(z.string()).optional(), 
+}); 
+
+
+export default defineEventHandler(async(event) => {
+   const body = await readValidatedBody(event, bodySchema.parse);
+
+    const product = await prisma.product.create({
+        data:body
+    });
+
+    return {
+        message : 'Producto actualizado',
+        product : product,
+    }
+
+})
+
+
+

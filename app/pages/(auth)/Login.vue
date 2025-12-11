@@ -3,17 +3,26 @@ import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
 definePageMeta({
-    layout:'login-layout'
+    layout:'login-layout',
+    middleware:'not-authenticated'
 })
 
 const toast = useToast()
+const cookieLoginEmail = useCookie<string|null>('login_email',{
+  sameSite:'strict',
+  maxAge: 60 * 60 * 24 * 30, 
+});
+
+const isPosting = ref(false);
+const {login} = useAuthentication();
 
 const fields: AuthFormField[] = [{
   name: 'email',
   type: 'email',
   label: 'Email',
   placeholder: 'Ingresa tu email',
-  required: true
+  required: true,
+  defaultValue: cookieLoginEmail.value ?? ''
 }, {
   name: 'password',
   label: 'Password',
@@ -21,9 +30,10 @@ const fields: AuthFormField[] = [{
   placeholder: 'Ingresa tu password',
   required: true
 }, {
-  name: 'recordarme',
-  label: 'Recordarme',
-  type: 'checkbox'
+  name: 'remember',
+  label: 'Recuerdarme',
+  type: 'checkbox',
+  defaultValue: !!cookieLoginEmail.value
 }]
 
 const providers = [{
@@ -42,13 +52,29 @@ const providers = [{
 
 const schema = z.object({
   email: z.email('Email inválido'),
-  password: z.string('Password es requerida').min(8, 'Debe contner al menos 8 caracteres')
+  password: z.string('Password es requerida').min(8, 'Debe contner al menos 8 caracteres'),
+  remember: z.boolean().optional(),
 })
 
 type Schema = z.output<typeof schema>
 
-function onSubmit(payload: FormSubmitEvent<Schema>) {
-  console.log('Submitted', payload)
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+  const {email, password, remember} = payload.data;
+  isPosting.value = true;
+  if(remember){
+    cookieLoginEmail.value = email
+  }else{
+    cookieLoginEmail.value = null
+  }
+
+  const isSuccessful = await login(email, password);
+
+  if(!isSuccessful){
+    toast.add({
+      title: 'Error login',
+      description: 'Credenciales no válidas'
+    })
+  }
 }
 </script>
 
@@ -63,6 +89,8 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
+        :loading="isPosting"
+        :disabled="isPosting"
         :ui="{
             leadingIcon:'text-3xl'
         }"

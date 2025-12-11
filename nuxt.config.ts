@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: '2025-12-05',
   devtools: { enabled: true },
   css:[
     '~/assets/css/main.css'
@@ -18,13 +18,23 @@ export default defineNuxtConfig({
     }
   },
 
+
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@prisma/nuxt',
+    'nuxt-auth-utils'
   ],
+
+  //  prisma: {
+  //   // Opcional pero recomendado:
+  //   autoSetupPrisma: true,  // Ejecuta automáticamente prisma generate
+  //   //log: ['query', 'error', 'warn'],
+  // },
 
   //config SPA
   // ssr:false,
