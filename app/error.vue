@@ -10,7 +10,7 @@ const props = defineProps<{
     <UError :error="error" 
       :clear="{
         size:'xl',
-        icon : 'i-lucide-error-left',
+        icon : 'i-lucide-arrow-left',
         class:'rounded-full',
       }"
       :ui="{

@@ -6,6 +6,6 @@ export interface Product {
     price: number,
     images : string[],
     tags: string[]
-    createdAt? : Date,
-    updatedAt?: Date
+    createdAt : Date |string | undefined,
+    updatedAt: Date | string |undefined
 }

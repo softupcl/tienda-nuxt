@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue';
 import type { TableColumn } from '@nuxt/ui';
-import { dateFormat } from '../../../../shared/utils/date-format';
+
 
 const UBadge = resolveComponent('UBadge');
 const NuxtLink = resolveComponent('NuxtLink');

@@ -1,17 +1,63 @@
 <script setup lang="ts">
-defineProps<{
+import type { ProductReview } from '@prisma/client';
+import type { User } from '#auth-utils';
+
+const props =defineProps<{
   buttonLabel: string;
+  slug: string;
+  user: User | null;
+}>();
+
+const toast = useToast();
+
+const emit = defineEmits<{
+  (event : 'review-posted', review: ProductReview): void;
 }>();
 
 const reviewText = ref('');
+const userTitle = ref('');
 const rating = ref(0);
 const isOpen = ref(false);
 
-const submitReview = () => {
-  console.log('submitReview');
+const submitReview = async () => {
+  // no usar useFetch  => $fetch
+  try {
+    const review = await $fetch<ProductReview>(
+      `/api/product/${props.slug}/reviews`,
+      {
+        method: 'POST',
+        body: {
+          rating: rating.value,
+          review: reviewText.value,
+          userTitle: reviewText.value,
+        },
+      }
+    );
+
+    emit('review-posted', review);
+    toast.add({
+      title: 'Reseña enviada',
+      description: 'Tu reseña ha sido enviada correctamente.',
+    });
+  } catch (error) {
+    toast.add({
+      title: 'Error al enviar reseña',
+      description: error instanceof Error ? error.message : 'Unknown error',
+      color: 'error',
+    });
+  }
 
   isOpen.value = false;
 };
+
+
+const handleCloseModal = (event: boolean)=>{
+  isOpen.value = event;
+  reviewText.value='';
+  userTitle.value='';
+  rating.value=0;
+}
+
 </script>
 
 <template>
@@ -20,6 +66,7 @@ const submitReview = () => {
     @close="isOpen = false"
     title="Añadir reseña"
     description="Deja tu reseña sobre el producto."
+    @update:open="handleCloseModal"
   >
     <UButton
       :label="buttonLabel"
@@ -49,6 +96,21 @@ const submitReview = () => {
                 @click="rating = star"
               />
             </div>
+          </div>
+
+          <div class="col-span-1">
+            <UInput
+              :model-value="user?.name"
+              class="w-full"
+              disabled
+            />
+          </div>
+          <div class="col-span-1">
+            <UInput
+              v-model="userTitle"
+              class="w-full"
+              placeholder="Titulo del usuario"
+            />
           </div>
 
           <div class="col-span-1">

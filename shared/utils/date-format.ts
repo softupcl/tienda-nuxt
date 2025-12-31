@@ -1,5 +1,4 @@
 export const dateFormat=(date:Date)=>{
-
       return  date.toLocaleDateString('es-CL', {
         day: '2-digit',
         month: 'short',

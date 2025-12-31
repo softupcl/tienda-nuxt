@@ -3,12 +3,14 @@ import { siteReviews } from './site-reviews.seed.ts';
 import { products } from './product-seed';
 import { users } from './users-seed';
 import bcrypt from 'bcryptjs';
+import { productReviews } from './product-reviews.seed';
 
 async function seedDatabase(){
-
-    await prisma.siteReview.deleteMany();
+    await prisma.productReview.deleteMany();
     await prisma.product.deleteMany();
+    await prisma.siteReview.deleteMany();
     await prisma.user.deleteMany();
+   
 
     const usersWithHashedPassword= users.map(user =>({
         ...user,
@@ -24,6 +26,19 @@ async function seedDatabase(){
     })
     await prisma.user.createMany({
         data: usersWithHashedPassword,
+    })
+
+    const productsCreated = await prisma.product.findMany();
+    const usersCreated = await prisma.user.findMany();
+    
+    const productReviewsCreated = productReviews.map((review)=>({
+        ...review,
+        productId : productsCreated[Math.floor(Math.random() * products.length)].id,
+        userId : usersCreated[Math.floor(Math.random() * users.length)].id
+    }));
+
+    await prisma.productReview.createMany({
+        data: productReviewsCreated,
     })
 
     console.log("Semilla ejecutada correctamente")

@@ -30,19 +30,7 @@ export default defineNuxtConfig({
     'nuxt-auth-utils'
   ],
 
-  //  prisma: {
-  //   // Opcional pero recomendado:
-  //   autoSetupPrisma: true,  // Ejecuta automáticamente prisma generate
-  //   //log: ['query', 'error', 'warn'],
-  // },
-
-  //config SPA
-  // ssr:false,
-  // nitro:{
-  //   preset:'static',
-  //   static:true
-  // }
-
+  
   //Pre render de todo el sitio
   nitro:{
    prerender:{

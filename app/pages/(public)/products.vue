@@ -1,4 +1,3 @@
-import { Product } from '../../../shared/types/product';
 <script setup lang="ts">
 // throw new Error('Auxilio, esto no se puede hacer.');
 // throw createError({
