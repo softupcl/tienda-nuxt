@@ -9,7 +9,7 @@ useSeoMeta({
   description: () => product.value?.description || '',
   ogTitle: () => product.value?.name || 'Producto',
   ogDescription: () => product.value?.description || '',
-  ogImage: () => product.value?.images?.[0] || '',
+  ogImage: () => product.value?.images?.[0] || ''
 });
 
 
