@@ -9,7 +9,11 @@ useSeoMeta({
   description: () => product.value?.description || '',
   ogTitle: () => product.value?.name || 'Producto',
   ogDescription: () => product.value?.description || '',
-  ogImage: () => product.value?.images?.[0] || ''
+  ogImage: () => product.value?.images?.[0] || '',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => product.value?.name || 'Producto',
+  twitterDescription: () => product.value?.description || '',
+  twitterImage: () => product.value?.images?.[0] || '',
 });
 
 
