@@ -3,6 +3,16 @@ const route = useRoute();
 const slug = route.params.slug as string;
 
 const {product} = await useProduct(slug);
+
+useSeoMeta({
+  title: () => product.value?.name || 'Producto',
+  description: () => product.value?.description || '',
+  ogTitle: () => product.value?.name || 'Producto',
+  ogDescription: () => product.value?.description || '',
+  ogImage: () => product.value?.images?.[0] || '',
+});
+
+
 // Si no se encuentra el producto, mostrar error 404
 if (!product.value) {
   navigateTo('/404');
